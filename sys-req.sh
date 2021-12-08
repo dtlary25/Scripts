@@ -6,18 +6,25 @@
 # The format below is to add multiline comments
 
 <<'Description'
-At work, after each linux server installation, i usually had to manually ssh to the server and check that certain parameters meet the requirements for better performance and security. This script is written to avoid repetitive work and to automate the task. The requirements are as follow:
+At work, after each linux server installation, 
+I usually had to manually ssh to the server and 
+check that certain parameters meet the requirements 
+for better performance and security. This script is 
+written to avoid repetitive work and to automate the task. 
+The requirements are as follow:
 - Check server name and version.
 - Hostname should be less than 60 characters.
 - Ip address should be 4 octects and valid.
 - OS bit version: 64-bit. if so, display architecture.
 - Memory should be at least 2 GB.
-- cpu should be at least 2 GHz.
+- CPU speed should be at least 2 GHz.
 - Hard drive should be at least 40 GB.
-- the server should contains these files: /etc/protocols, /etc/csh.login and /usr/sbin/ifconfig.
+- The server should contain the below files: 
+/etc/protocols, /etc/csh.login and /usr/sbin/ifconfig.
 Description
 
-# Defining colors for results output. RED for failure and GREEN for success!
+# Defining colors for results output. 
+# RED for failure and GREEN for success!
 
 RED="\e[31m"
 GREEN="\e[32m"
@@ -80,7 +87,7 @@ echo " checking validity ..."
 
 sleep 4
 
-# ip address should follow format a.b.c.d. if statement is to verify that
+# ip address should follow format a.b.c.d.
 
 if [[ $ipa =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
 echo -e "${GREEN} Valid IP address!${CLOSE}"
@@ -94,11 +101,12 @@ echo "3- Checking system requirements:"
 echo""
 sleep 4
 
-# Checking windowns bit and architecture
+# Checking OS version bit and architecture
+
 arc=`arch`
 bit=`arch | awk -F"_" '{print $2}'`
 
-echo "- Checking system bit and architecture:"
+echo "- Checking OS bit and architecture:"
 sleep 4
 
 if [[ $bit -eq 64 ]]; then
@@ -106,12 +114,14 @@ echo -e "${GREEN} Great! You are running a ${bit}-bit operating system!${CLOSE}"
 sleep 4
 echo -e "${GREEN} Your system architecture is ${arc}.${CLOSE}"
 else
-echo -e "${RED} You are running a ${bit}-bit operating system. Please upgrade your system!${CLOSE}"
+echo -e "${RED} You are running a ${bit}-bit operating system.${CLOSE}"
+echo -e "${RED} Please upgrade your system!${CLOSE}"
 fi
 echo""
 sleep 4
 
 # checking Memory size
+
 mem=`free -g | grep -i mem | awk '{print $2}'`
 echo "- RAM : ${mem} GB"
 sleep 4
@@ -123,13 +133,18 @@ fi
 echo ""
 sleep 4
 
-# checking cpu speed. The below value is in Mgh. Divide by 1000 to find value in Ghz
+# checking cpu speed. The below value is in Mgh. 
+# Divide by 1000 to find value in Ghz
 
 cpu=`lscpu | grep -i mhz | awk '{print $3}'`
 div=1000
+
+# By Defaut, bash only works with integers.
+# This format is to incorporate decimals.
+
 cpug=`echo "scale=2;$cpu / $div" | bc -l`
 
-echo "- CPU : ${cpug} GHz"
+echo "- CPU speed : ${cpug} GHz"
 sleep 4
 if (( $(echo "$cpug < 2" | bc -l) )); then
 echo -e "${RED} CPU check Failed! Should be at least 2 GHz.${CLOSE}"
@@ -140,6 +155,7 @@ echo ""
 sleep 4
 
 # checking hard drive size
+
 hd=`lsblk | grep -w sda | awk '{print $4}' | awk -F'G' '{print $1}'`
 echo "- Hard drive size : ${hd} GB"
 sleep 4
@@ -156,21 +172,6 @@ sleep 4
 echo "4- Checking files:"
 sleep 4
 echo""
-
-# First lets see if you are login as root.
-echo " Verifying root user privileges..."
-echo ""
-sleep 4
-
-user=`whoami`
-if [[ $user != "root" ]]; then
-echo -e "${RED} You are not a root user. You need additional privileges to for this operation. Please login as root to continue.${CLOSE}"
-else
-echo -e "${GREEN} You are a root user.${CLOSE}"
-fi
-echo""
-sleep 4
-
 echo " Checking files existence..."
 echo""
 sleep 4
@@ -195,8 +196,9 @@ fi
 echo ""
 sleep 4
 
-# Trying a different wway to do it!
-# Open the file without displaying the content.If it is  positive, file exists.
+# Trying a different way to do it.
+# Display the content without showing the output.
+# If it is positive, file exists.
 
 cat /usr/sbin/ifconfig >/dev/null
 
